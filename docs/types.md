@@ -5,7 +5,7 @@ invariants on types. We can also turn any type into null/error-unions using the 
 ### Defining Types
 Let's look at two templates for creating a new type:
 ```
-type <name> <range> where <invariant>;
+type <name> is <parent> where <invariant>;
 type <name> is <parent> where <invariant> {}
 ```
 Types can only have one parent, and there are a couple ways to set one. A parent could be an alias for another type, in that
@@ -25,9 +25,9 @@ These are all normal types, except for `uint`, `int`, and `float`. These values 
 larger values if need be (similar to vec).
 
 
-Another type parent is `range`. Note we do not use the `is` keyword.
+Another type parent is range. Note we do not use the `is` keyword.
 ```
-type Byte range 0 .. 255`
+type Byte is 1 .. 256`
 ```
 In the above example `Byte` is a numeric with the given range. We can range over types with sequential values like chars or enums.
 If we read this Byte type we know for sure the range of it's possible values, and can write less guard code.
@@ -35,14 +35,13 @@ If we read this Byte type we know for sure the range of it's possible values, an
 For more complicated constraints we can add invariants. Imagine we want a type that is only odd numbered values in the
 range of a byte. We could write:
 ```
-type OddByte is u8 where b -> b % 2 == 1;
+type OddByte is 1 .. 256 where self % 2 == 1;
 ```
 The `where` clause expects a function with `(OddByte) -> bool`.
 
 We can also add functions to our types that operate on the current value. For example:
 ```
-type OddByte range 1 .. 255 where b -> b % 2 == 1 {
-
+type OddByte is 1 .. 256 where self % 2 == 1 {
     fn inc(mut self) {
         self += 2;
     }
@@ -56,7 +55,7 @@ fn main() {
 }
 ```
 Note that the constructor for `OddByte` actually returns an `OddByte!`, that must be unwrapped. Here we use `.or_terminate()` but you
-could also use a `match` block.
+could also use a `match` block. Only types with a `where` clause return an error-union, as ranges can be verified as compile time.
 This program results in the following output:
 ```
 1

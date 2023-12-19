@@ -36,3 +36,5 @@ record Sealion;
 record Walrus;
 record ElephantSeal;
 ```
+Sealed interfaces allow you restrict the implementors of an interface, allowing you to write match cases with no
+default case.
